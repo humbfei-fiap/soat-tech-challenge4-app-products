@@ -1,0 +1,22 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fastfood-api-hpa
+  namespace: fastfood-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fastfood-api-deployment
+
+  minReplicas: 1
+  maxReplicas: 5
+  # Sintaxe corrigida para múltiplas métricas
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          # O HPA irá escalar quando o uso médio de memória ultrapassar 31% do que foi solicitado (requests.memory)
+          averageUtilization: 36

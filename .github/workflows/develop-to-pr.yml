@@ -1,0 +1,29 @@
+name: PR de Develop para Main
+
+on:
+  push:
+    branches:
+      - 'develop'
+    
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+ 
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        
+      - name: Criar Pull Request para develop
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: ${{ github.ref_name }}
+          destination_branch: "main"
+          pr_title: "PR aberto automaticamente: ${{ github.ref_name }} -> to main"
+          pr_body: |
+            Build da aplicação Java e da imagem Docker concluídos com sucesso.
+            O PR está pronto para revisão.
+          pr_label: "automação,docker"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
