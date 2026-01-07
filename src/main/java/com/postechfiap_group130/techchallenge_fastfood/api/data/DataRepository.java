@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class DataRepository implements DataSource {
@@ -74,7 +75,7 @@ public class DataRepository implements DataSource {
                         item.getCategory(),
                         item.getAvailable()
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -89,7 +90,7 @@ public class DataRepository implements DataSource {
                         item.getCategory(),
                         item.getAvailable()
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override

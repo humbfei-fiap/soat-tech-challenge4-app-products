@@ -1,6 +1,5 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
@@ -30,12 +29,13 @@ class ProductControllerTest {
     @DisplayName("Deve criar produto com sucesso")
     void shouldCreateProductSuccessfully() throws Exception {
         UUID newId = UUID.randomUUID();
-        ProductRequestDto request =
-                new ProductRequestDto("Burger", "Desc", new BigDecimal("20.00"), Product.Category.LANCHE);
+        ProductDto request =
+                new ProductDto(newId, "Burger", "Desc", new BigDecimal("20.00"),
+                        Product.Category.LANCHE, true);
 
         when(dataSource.existsByName("Burger")).thenReturn(false);
         when(dataSource.saveProduct(any())).thenReturn(
-                new ProductDto(UUID.randomUUID(),
+                new ProductDto(newId,
                         "Burger", "Desc",
                         new BigDecimal("20.00"),
                         Product.Category.LANCHE,
@@ -44,7 +44,6 @@ class ProductControllerTest {
         );
 
         ProductController controller = new ProductController(dataSource);
-
         ProductResponseDto response = controller.createProduct(request);
 
         assertNotNull(response);
@@ -58,8 +57,9 @@ class ProductControllerTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar produto duplicado")
     void shouldThrowExceptionWhenProductAlreadyExists() {
-        ProductRequestDto request =
-                new ProductRequestDto("Burger", "Desc", new BigDecimal("20.00"), Product.Category.LANCHE);
+        ProductDto request =
+                new ProductDto(UUID.randomUUID(), "Burger", "Desc", new BigDecimal("20.00"),
+                        Product.Category.LANCHE, true);
 
         when(dataSource.existsByName("Burger")).thenReturn(true);
 
@@ -120,7 +120,7 @@ class ProductControllerTest {
                 controller.getProductsByCategory(Product.Category.BEBIDA);
 
         assertEquals(1, result.size());
-        assertEquals("Coca", result.get(0).getName());
+        assertEquals("Coca", result.getFirst().getName());
 
         verify(dataSource).getByCategory(Product.Category.BEBIDA);
     }

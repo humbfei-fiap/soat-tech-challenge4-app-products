@@ -1,8 +1,10 @@
 package com.postechfiap_group130.techchallenge_fastfood.api.rest.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,7 @@ public class ProductResource {
     }
     @GetMapping("/category/{category}")
     public ResponseEntity<?> GetProductByCategory(@PathVariable Product.Category category) {
+        if (category == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Category");
         try {
             ProductController productController = new ProductController(dataRepository);
             List<ProductResponseDto> productResponseDto = productController.getProductsByCategory(category);
@@ -51,7 +54,10 @@ public class ProductResource {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto produtoDto) throws Exception {
+    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto productRequestDto) throws Exception {
+        ProductDto produtoDto = new ProductDto(UUID.randomUUID(), productRequestDto.getName(),
+                productRequestDto.getDescription(), productRequestDto.getPrice(), productRequestDto.getCategory(),
+                true);
         ProductController productController = new ProductController(dataRepository);
         ProductResponseDto productResponseDto = productController.createProduct(produtoDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDto);

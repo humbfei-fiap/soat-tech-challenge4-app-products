@@ -84,16 +84,28 @@ public class ProductEntity {
 
     public static ProductEntity fromEntity(Product product) {
         return new ProductEntity(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCategory(),
-                product.getAvailable()
+                product.id(),
+                product.name(),
+                product.description(),
+                product.price(),
+                product.category(),
+                product.available()
         );
     }
     
     public Product toDomain() {
         return new Product(id, name, description, price, category, available);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductEntity that = (ProductEntity) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

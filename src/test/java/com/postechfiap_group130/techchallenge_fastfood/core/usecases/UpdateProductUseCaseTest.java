@@ -55,23 +55,23 @@ class UpdateProductUseCaseTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(newId, result.getId());
-        assertEquals("Hamburguer", result.getName());
-        assertEquals("Hamburguer artesanal", result.getDescription());
-        assertEquals(new BigDecimal("29.90"), result.getPrice());
-        assertEquals(Product.Category.LANCHE, result.getCategory());
-        assertTrue(result.getAvailable());
+        assertEquals(newId, result.id());
+        assertEquals("Hamburguer", result.name());
+        assertEquals("Hamburguer artesanal", result.description());
+        assertEquals(new BigDecimal("29.90"), result.price());
+        assertEquals(Product.Category.LANCHE, result.category());
+        assertTrue(result.available());
 
         // Captura para validar o Product criado internamente
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productGateway, times(1)).updateProduct(productCaptor.capture());
 
         Product capturedProduct = productCaptor.getValue();
-        assertEquals(requestDto.getId(), capturedProduct.getId());
-        assertEquals(requestDto.getName(), capturedProduct.getName());
-        assertEquals(requestDto.getDescription(), capturedProduct.getDescription());
-        assertEquals(requestDto.getPrice(), capturedProduct.getPrice());
-        assertEquals(requestDto.getCategory(), capturedProduct.getCategory());
-        assertEquals(requestDto.getAvailable(), capturedProduct.getAvailable());
+        assertEquals(requestDto.getId(), capturedProduct.id());
+        assertEquals(requestDto.getName(), capturedProduct.name());
+        assertEquals(requestDto.getDescription(), capturedProduct.description());
+        assertEquals(requestDto.getPrice(), capturedProduct.price());
+        assertEquals(requestDto.getCategory(), capturedProduct.category());
+        assertEquals(requestDto.getAvailable(), capturedProduct.available());
     }
 }

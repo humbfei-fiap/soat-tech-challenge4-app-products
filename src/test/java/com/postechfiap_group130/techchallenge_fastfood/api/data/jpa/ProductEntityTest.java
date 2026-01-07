@@ -1,7 +1,6 @@
 package com.postechfiap_group130.techchallenge_fastfood.api.data.jpa;
 
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,162 +11,106 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductEntityTest {
 
     @Test
-    @DisplayName("Deve criar ProductEntity usando construtor com argumentos")
-    void shouldCreateUsingConstructor() {
-        UUID newId = UUID.randomUUID();
-        ProductEntity entity = new ProductEntity(
-                newId,
-                "Hamburguer",
-                "Hamburguer artesanal",
-                new BigDecimal("29.90"),
-                Product.Category.LANCHE,
-                true
-        );
+    void constructorAndGettersSetters_shouldWorkCorrectly() {
+        UUID id = UUID.randomUUID();
+        String name = "Burger";
+        String description = "Delicious burger";
+        BigDecimal price = BigDecimal.valueOf(25.90);
+        Product.Category category = Product.Category.LANCHE;
+        Boolean available = true;
 
-        assertEquals(newId, entity.getId());
-        assertEquals("Hamburguer", entity.getName());
-        assertEquals("Hamburguer artesanal", entity.getDescription());
-        assertEquals(new BigDecimal("29.90"), entity.getPrice());
-        assertEquals(Product.Category.LANCHE, entity.getCategory());
-        assertTrue(entity.getAvailable());
-    }
+        ProductEntity entity = new ProductEntity(id, name, description, price, category, available);
 
-    @Test
-    @DisplayName("Deve testar construtor vazio gerado pelo Lombok")
-    void shouldCreateUsingNoArgsConstructor() {
-        ProductEntity entity = new ProductEntity(null, null, null, null, null, null);
+        assertEquals(id, entity.getId());
+        assertEquals(name, entity.getName());
+        assertEquals(description, entity.getDescription());
+        assertEquals(price, entity.getPrice());
+        assertEquals(category, entity.getCategory());
+        assertEquals(available, entity.getAvailable());
 
-        assertNull(entity.getId());
-        assertNull(entity.getName());
-        assertNull(entity.getDescription());
-        assertNull(entity.getPrice());
-        assertNull(entity.getCategory());
-        assertNull(entity.getAvailable());
-    }
-
-    @Test
-    @DisplayName("Deve testar todos os setters e getters")
-    void shouldTestAllGettersAndSetters() {
-        ProductEntity entity = new ProductEntity(null, null, null, null, null, null);
         UUID newId = UUID.randomUUID();
         entity.setId(newId);
-        entity.setName("Refrigerante");
-        entity.setDescription("Coca-Cola lata");
-        entity.setPrice(new BigDecimal("7.50"));
-        entity.setCategory(Product.Category.BEBIDA);
-        entity.setAvailable(false);
-
         assertEquals(newId, entity.getId());
-        assertEquals("Refrigerante", entity.getName());
-        assertEquals("Coca-Cola lata", entity.getDescription());
-        assertEquals(new BigDecimal("7.50"), entity.getPrice());
+
+        entity.setName("New Name");
+        assertEquals("New Name", entity.getName());
+
+        entity.setDescription("New Desc");
+        assertEquals("New Desc", entity.getDescription());
+
+        entity.setPrice(BigDecimal.TEN);
+        assertEquals(BigDecimal.TEN, entity.getPrice());
+
+        entity.setCategory(Product.Category.BEBIDA);
         assertEquals(Product.Category.BEBIDA, entity.getCategory());
+
+        entity.setAvailable(false);
         assertFalse(entity.getAvailable());
     }
 
     @Test
-    @DisplayName("Deve converter Product para ProductEntity usando fromEntity")
-    void shouldConvertFromDomainToEntity() {
+    void equalsAndHashCode_shouldWorkCorrectly() {
+        UUID id = UUID.randomUUID();
+
+        ProductEntity e1 = new ProductEntity(id, "A", "B", BigDecimal.ONE, Product.Category.LANCHE, true);
+        ProductEntity e2 = new ProductEntity(id, "X", "Y", BigDecimal.TEN, Product.Category.BEBIDA, false);
+
+        // Same ID → must be equal
+        assertEquals(e1, e2);
+        assertEquals(e1.hashCode(), e2.hashCode());
+
+        // Different ID → must NOT be equal
+        ProductEntity e3 = new ProductEntity(UUID.randomUUID(), "A", "B", BigDecimal.ONE, Product.Category.LANCHE, true);
+        assertNotEquals(e1, e3);
+
+        // equals with null
+        assertNotEquals(e1, null);
+
+        // equals with different class
+        assertNotEquals(e1, "string");
+    }
+
+    @Test
+    void fromEntity_shouldConvertDomainToEntityCorrectly() {
+        UUID id = UUID.randomUUID();
         Product product = new Product(
-                UUID.randomUUID(),
-                "Batata Frita",
-                "Batata frita crocante",
-                new BigDecimal("15.00"),
-                Product.Category.ACOMPANHAMENTO,
+                id,
+                "Pizza",
+                "Cheese pizza",
+                BigDecimal.valueOf(40.0),
+                Product.Category.LANCHE,
                 true
         );
 
         ProductEntity entity = ProductEntity.fromEntity(product);
 
-        assertNotNull(entity);
-        assertEquals(product.getId(), entity.getId());
-        assertEquals(product.getName(), entity.getName());
-        assertEquals(product.getDescription(), entity.getDescription());
-        assertEquals(product.getPrice(), entity.getPrice());
-        assertEquals(product.getCategory(), entity.getCategory());
-        assertEquals(product.getAvailable(), entity.getAvailable());
+        assertEquals(product.id(), entity.getId());
+        assertEquals(product.name(), entity.getName());
+        assertEquals(product.description(), entity.getDescription());
+        assertEquals(product.price(), entity.getPrice());
+        assertEquals(product.category(), entity.getCategory());
+        assertEquals(product.available(), entity.getAvailable());
     }
 
     @Test
-    @DisplayName("Deve converter ProductEntity para Product usando toDomain")
-    void shouldConvertFromEntityToDomain() {
+    void toDomain_shouldConvertEntityToDomainCorrectly() {
+        UUID id = UUID.randomUUID();
         ProductEntity entity = new ProductEntity(
-                UUID.randomUUID(),
-                "Sobremesa",
-                "Pudim",
-                new BigDecimal("12.00"),
-                Product.Category.SOBREMESA,
+                id,
+                "Soda",
+                "Cold soda",
+                BigDecimal.valueOf(8.50),
+                Product.Category.BEBIDA,
                 true
         );
 
         Product product = entity.toDomain();
 
-        assertNotNull(product);
-        assertEquals(entity.getId(), product.getId());
-        assertEquals(entity.getName(), product.getName());
-        assertEquals(entity.getDescription(), product.getDescription());
-        assertEquals(entity.getPrice(), product.getPrice());
-        assertEquals(entity.getCategory(), product.getCategory());
-        assertEquals(entity.getAvailable(), product.getAvailable());
+        assertEquals(entity.getId(), product.id());
+        assertEquals(entity.getName(), product.name());
+        assertEquals(entity.getDescription(), product.description());
+        assertEquals(entity.getPrice(), product.price());
+        assertEquals(entity.getCategory(), product.category());
+        assertEquals(entity.getAvailable(), product.available());
     }
-
-    //@Test
-    @DisplayName("Deve cobrir todos os ramos reais de equals, hashCode e toString")
-    void shouldCoverAllEqualsHashCodeBranches() {
-
-        ProductEntity entity = new ProductEntity(
-                UUID.randomUUID(),
-                "Hamburguer",
-                "Teste",
-                new BigDecimal("10.00"),
-                Product.Category.LANCHE,
-                true
-        );
-
-        // 1️⃣ this == o
-        assertEquals(entity, entity);
-
-        // 2️⃣ comparação com null
-        assertNotEquals(entity, null);
-
-        // 3️⃣ comparação com classe diferente
-        assertNotEquals(entity, "string");
-
-        // 4️⃣ objetos iguais
-        ProductEntity sameEntity = new ProductEntity(
-                UUID.randomUUID(),
-                "Hamburguer",
-                "Teste",
-                new BigDecimal("10.00"),
-                Product.Category.LANCHE,
-                true
-        );
-        assertEquals(entity, sameEntity);
-        assertEquals(entity.hashCode(), sameEntity.hashCode());
-
-        // 5️⃣ diferença em campo
-        ProductEntity differentEntity = new ProductEntity(
-                UUID.randomUUID(), // id diferente
-                "Hamburguer",
-                "Teste",
-                new BigDecimal("10.00"),
-                Product.Category.LANCHE,
-                true
-        );
-        assertNotEquals(entity, differentEntity);
-
-        // 6️⃣ campos nulos
-        ProductEntity nullEntity1 = new ProductEntity(
-                null, null, null, null, null, null
-        );
-        ProductEntity nullEntity2 = new ProductEntity(
-                null, null, null, null, null, null
-        );
-        assertEquals(nullEntity1, nullEntity2);
-        assertEquals(nullEntity1.hashCode(), nullEntity2.hashCode());
-
-        // 7️⃣ toString
-        assertNotNull(entity.toString());
-    }
-
 }

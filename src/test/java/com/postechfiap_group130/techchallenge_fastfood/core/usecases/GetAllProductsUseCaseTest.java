@@ -43,7 +43,7 @@ class GetAllProductsUseCaseTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Hamburguer", result.get(0).getName());
+        assertEquals("Hamburguer", result.get(0).name());
 
         verify(productGateway, times(1)).findAll();
     }

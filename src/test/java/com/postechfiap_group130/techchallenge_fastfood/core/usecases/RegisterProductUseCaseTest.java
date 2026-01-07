@@ -1,6 +1,7 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.usecases;
 
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import com.postechfiap_group130.techchallenge_fastfood.core.gateways.ProductGateway;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +27,16 @@ class RegisterProductUseCaseTest {
     @DisplayName("Deve registrar um produto chamando o gateway com dados do DTO")
     void shouldRegisterProduct() {
         // Arrange
-        ProductRequestDto requestDto = new ProductRequestDto(
+        UUID newId = UUID.randomUUID();
+        ProductDto requestDto = new ProductDto(
+                newId,
                 "Batata Frita",
                 "Batata frita crocante",
                 new BigDecimal("12.50"),
-                Product.Category.ACOMPANHAMENTO
+                Product.Category.ACOMPANHAMENTO,
+                true
         );
-        UUID newId = UUID.randomUUID();
+
         Product savedProduct = new Product(
                 newId,
                 "Batata Frita",
@@ -52,22 +56,22 @@ class RegisterProductUseCaseTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(newId, result.getId());
-        assertEquals("Batata Frita", result.getName());
-        assertEquals("Batata frita crocante", result.getDescription());
-        assertEquals(new BigDecimal("12.50"), result.getPrice());
-        assertEquals(Product.Category.ACOMPANHAMENTO, result.getCategory());
-        assertTrue(result.getAvailable());
+        assertEquals(newId, result.id());
+        assertEquals("Batata Frita", result.name());
+        assertEquals("Batata frita crocante", result.description());
+        assertEquals(new BigDecimal("12.50"), result.price());
+        assertEquals(Product.Category.ACOMPANHAMENTO, result.category());
+        assertTrue(result.available());
 
         // Captura do Product criado internamente
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productGateway, times(1)).saveProduct(productCaptor.capture());
 
         Product capturedProduct = productCaptor.getValue();
-        assertEquals(requestDto.getName(), capturedProduct.getName());
-        assertEquals(requestDto.getDescription(), capturedProduct.getDescription());
-        assertEquals(requestDto.getPrice(), capturedProduct.getPrice());
-        assertEquals(requestDto.getCategory(), capturedProduct.getCategory());
-        assertNotNull(capturedProduct.getAvailable()); // default definido na entidade
+        assertEquals(requestDto.getName(), capturedProduct.name());
+        assertEquals(requestDto.getDescription(), capturedProduct.description());
+        assertEquals(requestDto.getPrice(), capturedProduct.price());
+        assertEquals(requestDto.getCategory(), capturedProduct.category());
+        assertEquals(requestDto.getAvailable(), capturedProduct.available());
     }
 }

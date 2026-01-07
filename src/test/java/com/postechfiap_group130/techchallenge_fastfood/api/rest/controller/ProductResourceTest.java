@@ -5,21 +5,23 @@ import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.Prod
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
+import com.postechfiap_group130.techchallenge_fastfood.core.controllers.ProductController;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,127 +30,200 @@ class ProductResourceTest {
     @Mock
     private DataRepository dataRepository;
 
-    @InjectMocks
-    private ProductResource productResource;
+    @Test
+    void getAll_shouldReturnOk_whenControllerReturnsList() {
+        ProductResource resource = new ProductResource(dataRepository);
 
-    @BeforeEach
-    void setup() {
-        productResource = new ProductResource(dataRepository);
+        ProductResponseDto responseDto = Mockito.mock(ProductResponseDto.class);
+        List<ProductResponseDto> list = Collections.singletonList(responseDto);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getAll()).thenReturn(list))) {
+
+            ResponseEntity<?> response = resource.GetAll();
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(list, response.getBody());
+            assertEquals(1, mocked.constructed().size());
+        }
     }
 
     @Test
-    void getAll_shouldReturnOk() {
-        when(dataRepository.getAll()).thenReturn(List.of());
+    void getAll_shouldReturnBadRequest_whenIllegalArgumentExceptionThrown() {
+        ProductResource resource = new ProductResource(dataRepository);
 
-        ResponseEntity<?> response = productResource.GetAll();
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getAll()).thenThrow(new IllegalArgumentException()))) {
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+            ResponseEntity<?> response = resource.GetAll();
+
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertEquals("Invalid Category", response.getBody());
+        }
     }
 
     @Test
-    void getAll_shouldReturnInternalServerError() {
-        when(dataRepository.getAll()).thenThrow(RuntimeException.class);
+    void getAll_shouldReturnInternalServerError_whenGenericExceptionThrown() {
+        ProductResource resource = new ProductResource(dataRepository);
 
-        ResponseEntity<?> response = productResource.GetAll();
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getAll()).thenThrow(new RuntimeException("error")))) {
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            ResponseEntity<?> response = resource.GetAll();
+
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertNull(response.getBody());
+        }
     }
 
     @Test
-    void getByCategory_shouldReturnOk() {
-        when(dataRepository.getByCategory(Product.Category.LANCHE))
-                .thenReturn(List.of());
+    void getProductByCategory_shouldReturnBadRequest_whenCategoryIsNull() {
+        ProductResource resource = new ProductResource(dataRepository);
 
-        ResponseEntity<?> response =
-                productResource.GetProductByCategory(Product.Category.LANCHE);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    //@Test
-    void getByCategory_shouldReturnBadRequestForInvalidCategory() {
-        ResponseEntity<?> response =
-                productResource.GetProductByCategory(null);
+        ResponseEntity<?> response = resource.GetProductByCategory(null);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    //@Test
-    void create_shouldReturnCreated() throws Exception {
-        ProductRequestDto request =
-                new ProductRequestDto(
-                        "Burger",
-                        "Desc",
-                        new BigDecimal("20.00"),
-                        Product.Category.LANCHE
-                );
-
-        when(dataRepository.existsByName("Burger")).thenReturn(false);
-        when(dataRepository.saveProduct(any())).thenReturn(null);
-
-        ResponseEntity<ProductResponseDto> response =
-                productResource.create(request);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    }
-
-    //@Test
-    void update_shouldReturnOk() {
-        UpdateProductRequestDto request =
-                new UpdateProductRequestDto(
-                        UUID.randomUUID(),
-                        "Burger",
-                        "Updated",
-                        new BigDecimal("25.00"),
-                        Product.Category.LANCHE,
-                        true
-                );
-
-        ResponseEntity<?> response =
-                productResource.updateProduct(request);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    //@Test
-    void update_shouldReturnBadRequestOnDomainException() throws DomainException{
-        UpdateProductRequestDto request =
-                new UpdateProductRequestDto(
-                        UUID.randomUUID(),
-                        null,
-                        "",
-                        new BigDecimal("25.00"),
-                        Product.Category.LANCHE,
-                        true
-                );
-
-        doThrow(new DomainException("Invalid data"))
-                .when(dataRepository).updateProduct(any());
-
-        ResponseEntity<?> response =
-                productResource.updateProduct(request);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invalid Category", response.getBody());
     }
 
     @Test
-    void update_shouldReturnInternalServerError() {
-        UpdateProductRequestDto request =
-                new UpdateProductRequestDto(
-                        UUID.randomUUID(),
-                        "Burger",
-                        "Error",
-                        new BigDecimal("25.00"),
-                        Product.Category.LANCHE,
-                        true
-                );
+    void getProductByCategory_shouldReturnOk_whenControllerReturnsList() {
+        ProductResource resource = new ProductResource(dataRepository);
 
-        doThrow(RuntimeException.class)
-                .when(dataRepository).updateProduct(any());
+        Product.Category category = Mockito.mock(Product.Category.class);
+        ProductResponseDto responseDto = Mockito.mock(ProductResponseDto.class);
+        List<ProductResponseDto> list = Collections.singletonList(responseDto);
 
-        ResponseEntity<?> response =
-                productResource.updateProduct(request);
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getProductsByCategory(category)).thenReturn(list))) {
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            ResponseEntity<?> response = resource.GetProductByCategory(category);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(list, response.getBody());
+        }
+    }
+
+    @Test
+    void getProductByCategory_shouldReturnBadRequest_whenIllegalArgumentExceptionThrown() {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        Product.Category category = Mockito.mock(Product.Category.class);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getProductsByCategory(category))
+                                     .thenThrow(new IllegalArgumentException()))) {
+
+            ResponseEntity<?> response = resource.GetProductByCategory(category);
+
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertEquals("Invalid Category", response.getBody());
+        }
+    }
+
+    @Test
+    void getProductByCategory_shouldReturnInternalServerError_whenGenericExceptionThrown() {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        Product.Category category = Mockito.mock(Product.Category.class);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.getProductsByCategory(category))
+                                     .thenThrow(new RuntimeException("error")))) {
+
+            ResponseEntity<?> response = resource.GetProductByCategory(category);
+
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertNull(response.getBody());
+        }
+    }
+
+    @Test
+    void create_shouldReturnCreatedWithResponseBody() throws Exception {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        ProductRequestDto requestDto = Mockito.mock(ProductRequestDto.class);
+        when(requestDto.getName()).thenReturn("Product 1");
+        when(requestDto.getDescription()).thenReturn("Desc");
+        when(requestDto.getPrice()).thenReturn(new BigDecimal("10.0"));
+        when(requestDto.getCategory()).thenReturn(Mockito.mock(Product.Category.class));
+
+        ProductResponseDto responseDto = Mockito.mock(ProductResponseDto.class);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> when(mock.createProduct(any(ProductDto.class)))
+                                     .thenReturn(responseDto))) {
+
+            ResponseEntity<ProductResponseDto> response = resource.create(requestDto);
+
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertSame(responseDto, response.getBody());
+            ProductController constructed = mocked.constructed().get(0);
+            verify(constructed, times(1)).createProduct(any(ProductDto.class));
+        }
+    }
+
+    @Test
+    void updateProduct_shouldReturnOk_whenUpdateSucceeds() throws DomainException {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        UpdateProductRequestDto updateDto = Mockito.mock(UpdateProductRequestDto.class);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> {
+                                 // no-op, just don't throw
+                             })) {
+
+            ResponseEntity<?> response = resource.updateProduct(updateDto);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNull(response.getBody());
+            ProductController constructed = mocked.constructed().get(0);
+            verify(constructed, times(1)).updateProduct(updateDto);
+        }
+    }
+
+    @Test
+    void updateProduct_shouldReturnBadRequest_whenDomainExceptionThrown() throws DomainException {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        UpdateProductRequestDto updateDto = Mockito.mock(UpdateProductRequestDto.class);
+        DomainException domainException = new DomainException("Domain error");
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> doThrow(domainException).when(mock).updateProduct(updateDto))) {
+
+            ResponseEntity<?> response = resource.updateProduct(updateDto);
+
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertEquals("Domain error", response.getBody());
+        }
+    }
+
+    @Test
+    void updateProduct_shouldReturnInternalServerError_whenGenericExceptionThrown() throws DomainException {
+        ProductResource resource = new ProductResource(dataRepository);
+
+        UpdateProductRequestDto updateDto = Mockito.mock(UpdateProductRequestDto.class);
+
+        try (MockedConstruction<ProductController> mocked =
+                     Mockito.mockConstruction(ProductController.class,
+                             (mock, context) -> doThrow(new RuntimeException("error"))
+                                     .when(mock).updateProduct(updateDto))) {
+
+            ResponseEntity<?> response = resource.updateProduct(updateDto);
+
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertNull(response.getBody());
+        }
     }
 }

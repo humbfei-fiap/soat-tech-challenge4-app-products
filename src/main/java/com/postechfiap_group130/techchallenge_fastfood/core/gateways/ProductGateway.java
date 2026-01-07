@@ -18,18 +18,20 @@ public class ProductGateway implements IProductGateway {
 
     @Override
     public Product saveProduct(Product product) {
-        ProductDto productDto = new ProductDto(product.getId(), product.getName(), product.getDescription(), product.getPrice(), product.getCategory(), product.getAvailable());
+        ProductDto productDto = new ProductDto(product.id(), product.name(), product.description(), product.price(), product.category(), product.available());
         productDto = dataSource.saveProduct(productDto);
-        return new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
+        product = new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
                 productDto.getPrice(), productDto.getCategory(), productDto.getAvailable());
+        return product;
     }
 
     @Override
     public Product updateProduct(Product product) {
-        ProductDto productDto = new ProductDto(product.getId(), product.getName(), product.getDescription(), product.getPrice(), product.getCategory(), product.getAvailable());
+        ProductDto productDto = new ProductDto(product.id(), product.name(), product.description(), product.price(), product.category(), product.available());
         productDto = dataSource.updateProduct(productDto);
-        return new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
+        product = new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
                 productDto.getPrice(), productDto.getCategory(), productDto.getAvailable());
+        return product;
     }
 
     @Override

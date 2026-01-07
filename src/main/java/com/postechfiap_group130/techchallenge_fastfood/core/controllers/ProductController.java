@@ -2,10 +2,10 @@ package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 
 import java.util.List;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import com.postechfiap_group130.techchallenge_fastfood.core.gateways.ProductGateway;
 import com.postechfiap_group130.techchallenge_fastfood.core.interfaces.DataSource;
@@ -17,14 +17,14 @@ import com.postechfiap_group130.techchallenge_fastfood.core.usecases.UpdateProdu
 
 public record ProductController(DataSource dataSource) {
 
-    public ProductResponseDto createProduct(ProductRequestDto productRequestDto) throws Exception {
+    public ProductResponseDto createProduct(ProductDto productDto) throws Exception {
         ProductGateway productGateway = new ProductGateway(dataSource);
-        Boolean existProduct = productGateway.existsByName(productRequestDto.getName());
+        Boolean existProduct = productGateway.existsByName(productDto.getName());
         if (existProduct) {
             throw new DomainException("Product name already registered in the database!");
         }
         RegisterProductUseCase registerProductUseCase = new RegisterProductUseCase(productGateway);
-        Product product = registerProductUseCase.execute(productRequestDto);
+        Product product = registerProductUseCase.execute(productDto);
         return ProductPresenter.toDto(product);
     }
 

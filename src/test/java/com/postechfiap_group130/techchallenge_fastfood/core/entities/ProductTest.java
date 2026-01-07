@@ -31,29 +31,31 @@ class ProductTest {
                 true
         );
 
-        assertEquals(newId, product.getId());
-        assertEquals("Hamburguer", product.getName());
-        assertEquals("Hamburguer artesanal", product.getDescription());
-        assertEquals(new BigDecimal("25.90"), product.getPrice());
-        assertEquals(Product.Category.LANCHE, product.getCategory());
-        assertTrue(product.getAvailable());
+        assertEquals(newId, product.id());
+        assertEquals("Hamburguer", product.name());
+        assertEquals("Hamburguer artesanal", product.description());
+        assertEquals(new BigDecimal("25.90"), product.price());
+        assertEquals(Product.Category.LANCHE, product.category());
+        assertTrue(product.available());
     }
 
     @Test
     @DisplayName("Deve criar produto válido usando construtor simplificado e available=true por padrão")
     void shouldCreateProductUsingSimplifiedConstructor() {
         Product product = new Product(
+                UUID.randomUUID(),
                 "Refrigerante",
                 "Coca-Cola 350ml",
                 new BigDecimal("6.50"),
-                Product.Category.BEBIDA
+                Product.Category.BEBIDA,
+                true
         );
 
-        assertEquals("Refrigerante", product.getName());
-        assertEquals("Coca-Cola 350ml", product.getDescription());
-        assertEquals(new BigDecimal("6.50"), product.getPrice());
-        assertEquals(Product.Category.BEBIDA, product.getCategory());
-        assertTrue(product.getAvailable());
+        assertEquals("Refrigerante", product.name());
+        assertEquals("Coca-Cola 350ml", product.description());
+        assertEquals(new BigDecimal("6.50"), product.price());
+        assertEquals(Product.Category.BEBIDA, product.category());
+        assertTrue(product.available());
     }
 
     // =======================
@@ -66,10 +68,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         null,
                         "Descrição",
                         new BigDecimal("10.00"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -82,10 +86,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "",
                         "Descrição",
                         new BigDecimal("10.00"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -100,10 +106,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         longName,
                         "Descrição",
                         new BigDecimal("10.00"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -120,10 +128,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "Produto",
                         null,
                         new BigDecimal("10.00"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -136,10 +146,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "Produto",
                         "",
                         new BigDecimal("10.00"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -156,10 +168,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "Produto",
                         "Descrição",
                         null,
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -172,10 +186,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "Produto",
                         "Descrição",
                         BigDecimal.ZERO,
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -188,10 +204,12 @@ class ProductTest {
         DomainException exception = assertThrows(
                 DomainException.class,
                 () -> new Product(
+                        UUID.randomUUID(),
                         "Produto",
                         "Descrição",
                         new BigDecimal("-1"),
-                        Product.Category.LANCHE
+                        Product.Category.LANCHE,
+                        true
                 )
         );
 
@@ -209,13 +227,5 @@ class ProductTest {
         assertEquals(Product.Category.BEBIDA, Product.Category.valueOf("BEBIDA"));
         assertEquals(Product.Category.ACOMPANHAMENTO, Product.Category.valueOf("ACOMPANHAMENTO"));
         assertEquals(Product.Category.SOBREMESA, Product.Category.valueOf("SOBREMESA"));
-    }
-
-    @Test
-    @DisplayName("Deve cobrir getter do enum Category (campo interno null)")
-    void shouldCoverCategoryGetter() {
-        Product.Category category = Product.Category.LANCHE;
-
-        assertNull(category.getCategory());
     }
 }

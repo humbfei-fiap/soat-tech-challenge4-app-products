@@ -60,12 +60,12 @@ class ProductGatewayTest {
         Product result = productGateway.saveProduct(product);
 
         assertNotNull(result);
-        assertEquals(productDto.getId(), result.getId());
-        assertEquals(productDto.getName(), result.getName());
-        assertEquals(productDto.getDescription(), result.getDescription());
-        assertEquals(productDto.getPrice(), result.getPrice());
-        assertEquals(productDto.getCategory(), result.getCategory());
-        assertEquals(productDto.getAvailable(), result.getAvailable());
+        assertEquals(productDto.getId(), result.id());
+        assertEquals(productDto.getName(), result.name());
+        assertEquals(productDto.getDescription(), result.description());
+        assertEquals(productDto.getPrice(), result.price());
+        assertEquals(productDto.getCategory(), result.category());
+        assertEquals(productDto.getAvailable(), result.available());
 
         verify(dataSource, times(1)).saveProduct(any(ProductDto.class));
     }
@@ -78,7 +78,7 @@ class ProductGatewayTest {
         Product result = productGateway.updateProduct(product);
 
         assertNotNull(result);
-        assertEquals(product.getId(), result.getId());
+        assertEquals(product.id(), result.id());
 
         verify(dataSource, times(1)).updateProduct(any(ProductDto.class));
     }
@@ -92,7 +92,7 @@ class ProductGatewayTest {
         Product result = productGateway.findById(id);
 
         assertNotNull(result);
-        assertEquals(id, result.getId());
+        assertEquals(id, result.id());
 
         verify(dataSource, times(1)).findById(id);
     }
@@ -119,7 +119,7 @@ class ProductGatewayTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(productDto.getName(), result.get(0).getName());
+        assertEquals(productDto.getName(), result.get(0).name());
 
         verify(dataSource, times(1)).getAll();
     }
@@ -134,7 +134,7 @@ class ProductGatewayTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(Product.Category.LANCHE, result.get(0).getCategory());
+        assertEquals(Product.Category.LANCHE, result.get(0).category());
 
         verify(dataSource, times(1)).getByCategory(Product.Category.LANCHE);
     }

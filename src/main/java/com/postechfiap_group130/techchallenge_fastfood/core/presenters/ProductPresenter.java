@@ -9,24 +9,24 @@ public class ProductPresenter {
 
     public static ProductResponseDto toDto(Product product) {
         return new ProductResponseDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getCategory(),
-                        product.getAvailable()
+                        product.id(),
+                        product.name(),
+                        product.description(),
+                        product.price(),
+                        product.category(),
+                        product.available()
                     );
     }
 
     public static List<ProductResponseDto> toDtoList(List<Product> listProduct) {
         List<ProductResponseDto> productDtoList = listProduct.stream()
                 .map((product -> new ProductResponseDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getCategory(),
-                        product.getAvailable()
+                        product.id(),
+                        product.name(),
+                        product.description(),
+                        product.price(),
+                        product.category(),
+                        product.available()
                     )))
                 .toList();
         return productDtoList;
