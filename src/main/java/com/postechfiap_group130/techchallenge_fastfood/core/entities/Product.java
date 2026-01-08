@@ -8,10 +8,10 @@ public record Product(UUID id, String name, String description, BigDecimal price
                       Boolean available) {
 
     public Product {
-        Validate(name, description, price, category);
+        validate(name, description, price, category);
     }
 
-    private void Validate(String name, String description, BigDecimal price, Category category) throws DomainException {
+    private void validate(String name, String description, BigDecimal price, Category category) throws DomainException {
         if (name == null || name.isEmpty()) {
             throw new DomainException("Product name cannot be null or empty");
         }

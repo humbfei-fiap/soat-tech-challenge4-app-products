@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 public class DataRepository implements DataSource {
@@ -59,23 +58,24 @@ public class DataRepository implements DataSource {
                 productEntity.getPrice(),
                 productEntity.getCategory(),
                 productEntity.getAvailable())).orElse(null);
-
     }
 
     @Override
-    public List<ProductDto> getAll() {
+    public ProductDto findByName(String name) {
+        ProductEntity productEntity = productJpaRepository.findByName(name);
 
-        List<ProductEntity> products = productJpaRepository.getAll();
-        return products.stream()
-                .map(item -> new ProductDto(
-                        item.getId(),
-                        item.getName(),
-                        item.getDescription(),
-                        item.getPrice(),
-                        item.getCategory(),
-                        item.getAvailable()
-                ))
-                .collect(Collectors.toList());
+        if (productEntity == null) {
+            return null;
+        }
+
+        return new ProductDto(
+                productEntity.getId(),
+                productEntity.getName(),
+                productEntity.getDescription(),
+                productEntity.getPrice(),
+                productEntity.getCategory(),
+                productEntity.getAvailable()
+        );
     }
 
     @Override
@@ -89,8 +89,7 @@ public class DataRepository implements DataSource {
                         item.getPrice(),
                         item.getCategory(),
                         item.getAvailable()
-                ))
-                .collect(Collectors.toList());
+                )).toList();
     }
 
     @Override

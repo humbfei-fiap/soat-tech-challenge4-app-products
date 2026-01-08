@@ -21,40 +21,39 @@ class ProductTest {
     @Test
     @DisplayName("Deve criar produto válido usando construtor completo e validar getters")
     void shouldCreateProductWithAllArgumentsAndValidateGetters() {
-        UUID newId = UUID.randomUUID();
-        Product product = new Product(
-                newId,
-                "Hamburguer",
-                "Hamburguer artesanal",
-                new BigDecimal("25.90"),
-                Product.Category.LANCHE,
-                true
-        );
+        UUID id = UUID.randomUUID();
+        String name = "Hamburguer";
+        String description = "Hamburguer artesanal";
+        BigDecimal price = new BigDecimal("25.90");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
 
-        assertEquals(newId, product.id());
-        assertEquals("Hamburguer", product.name());
-        assertEquals("Hamburguer artesanal", product.description());
-        assertEquals(new BigDecimal("25.90"), product.price());
-        assertEquals(Product.Category.LANCHE, product.category());
+        Product product = new Product(id, name, description, price, category, available);
+
+        assertEquals(id, product.id());
+        assertEquals(name, product.name());
+        assertEquals(description, product.description());
+        assertEquals(price, product.price());
+        assertEquals(category, product.category());
         assertTrue(product.available());
     }
 
     @Test
-    @DisplayName("Deve criar produto válido usando construtor simplificado e available=true por padrão")
+    @DisplayName("Deve criar produto válido usando construtor simplificado")
     void shouldCreateProductUsingSimplifiedConstructor() {
-        Product product = new Product(
-                UUID.randomUUID(),
-                "Refrigerante",
-                "Coca-Cola 350ml",
-                new BigDecimal("6.50"),
-                Product.Category.BEBIDA,
-                true
-        );
+        UUID id = UUID.randomUUID();
+        String name = "Refrigerante";
+        String description = "Coca-Cola 350ml";
+        BigDecimal price = new BigDecimal("6.50");
+        Product.Category category = Product.Category.BEBIDA;
+        boolean available = true;
 
-        assertEquals("Refrigerante", product.name());
-        assertEquals("Coca-Cola 350ml", product.description());
-        assertEquals(new BigDecimal("6.50"), product.price());
-        assertEquals(Product.Category.BEBIDA, product.category());
+        Product product = new Product(id, name, description, price, category, available);
+
+        assertEquals(name, product.name());
+        assertEquals(description, product.description());
+        assertEquals(price, product.price());
+        assertEquals(category, product.category());
         assertTrue(product.available());
     }
 
@@ -65,16 +64,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando nome for null")
     void shouldThrowExceptionWhenNameIsNull() {
+        UUID id = UUID.randomUUID();
+        String name = null;
+        String description = "Descrição";
+        BigDecimal price = new BigDecimal("10.00");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        null,
-                        "Descrição",
-                        new BigDecimal("10.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product name cannot be null or empty", exception.getMessage());
@@ -83,16 +82,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando nome for vazio")
     void shouldThrowExceptionWhenNameIsEmpty() {
+        UUID id = UUID.randomUUID();
+        String name = "";
+        String description = "Descrição";
+        BigDecimal price = new BigDecimal("10.00");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "",
-                        "Descrição",
-                        new BigDecimal("10.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product name cannot be null or empty", exception.getMessage());
@@ -101,18 +100,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando nome exceder 100 caracteres")
     void shouldThrowExceptionWhenNameIsTooLong() {
-        String longName = "A".repeat(101);
+        UUID id = UUID.randomUUID();
+        String name = "A".repeat(101);
+        String description = "Descrição";
+        BigDecimal price = new BigDecimal("10.00");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
 
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        longName,
-                        "Descrição",
-                        new BigDecimal("10.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product name is too long. Max length is 100", exception.getMessage());
@@ -125,16 +122,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando descrição for null")
     void shouldThrowExceptionWhenDescriptionIsNull() {
+        UUID id = UUID.randomUUID();
+        String name = "Produto";
+        String description = null;
+        BigDecimal price = new BigDecimal("10.00");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "Produto",
-                        null,
-                        new BigDecimal("10.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product description cannot be null or empty", exception.getMessage());
@@ -143,16 +140,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando descrição for vazia")
     void shouldThrowExceptionWhenDescriptionIsEmpty() {
+        UUID id = UUID.randomUUID();
+        String name = "Produto";
+        String description = "";
+        BigDecimal price = new BigDecimal("10.00");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "Produto",
-                        "",
-                        new BigDecimal("10.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product description cannot be null or empty", exception.getMessage());
@@ -165,16 +162,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando preço for null")
     void shouldThrowExceptionWhenPriceIsNull() {
+        UUID id = UUID.randomUUID();
+        String name = "Produto";
+        String description = "Descrição";
+        BigDecimal price = null;
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "Produto",
-                        "Descrição",
-                        null,
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product price must be not null", exception.getMessage());
@@ -183,16 +180,16 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando preço for zero")
     void shouldThrowExceptionWhenPriceIsZero() {
+        UUID id = UUID.randomUUID();
+        String name = "Produto";
+        String description = "Descrição";
+        BigDecimal price = BigDecimal.ZERO;
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "Produto",
-                        "Descrição",
-                        BigDecimal.ZERO,
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product price must be greater than 0", exception.getMessage());
@@ -201,23 +198,23 @@ class ProductTest {
     @Test
     @DisplayName("Deve lançar exceção quando preço for negativo")
     void shouldThrowExceptionWhenPriceIsNegative() {
+        UUID id = UUID.randomUUID();
+        String name = "Produto";
+        String description = "Descrição";
+        BigDecimal price = new BigDecimal("-1");
+        Product.Category category = Product.Category.LANCHE;
+        boolean available = true;
+
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> new Product(
-                        UUID.randomUUID(),
-                        "Produto",
-                        "Descrição",
-                        new BigDecimal("-1"),
-                        Product.Category.LANCHE,
-                        true
-                )
+                () -> new Product(id, name, description, price, category, available)
         );
 
         assertEquals("Product price must be greater than 0", exception.getMessage());
     }
 
     // =======================
-    // ENUM CATEGORY (100% coverage)
+    // ENUM CATEGORY
     // =======================
 
     @Test

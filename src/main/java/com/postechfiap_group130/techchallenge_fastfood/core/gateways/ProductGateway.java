@@ -44,13 +44,12 @@ public class ProductGateway implements IProductGateway {
     }
 
     @Override
-    public List<Product> findAll() {
-        List<ProductDto> productDTOs = dataSource.getAll();
-        return productDTOs.stream()
-                .map(productDto ->
-                        new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
-                                productDto.getPrice(), productDto.getCategory(), productDto.getAvailable()))
-                .toList();
+    public Product findByName(String name) {
+        ProductDto productDto = dataSource.findByName(name);
+        if (productDto == null) return null;
+
+        return new Product(productDto.getId(), productDto.getName(), productDto.getDescription(),
+                productDto.getPrice(), productDto.getCategory(), productDto.getAvailable());
     }
 
     @Override

@@ -5,12 +5,16 @@ import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.Pro
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
+import com.postechfiap_group130.techchallenge_fastfood.core.gateways.ProductGateway;
 import com.postechfiap_group130.techchallenge_fastfood.core.interfaces.DataSource;
+import com.postechfiap_group130.techchallenge_fastfood.core.presenters.ProductPresenter;
+import com.postechfiap_group130.techchallenge_fastfood.core.usecases.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,137 +23,190 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
 
-    @Mock
     private DataSource dataSource;
+    private ProductController controller;
+
+    @BeforeEach
+    void setup() {
+        dataSource = mock(DataSource.class);
+        controller = new ProductController(dataSource);
+    }
+
+    private Product product() {
+        return new Product(
+                UUID.randomUUID(),
+                "Produto",
+                "Descrição",
+                BigDecimal.TEN,
+                Product.Category.LANCHE,
+                true
+        );
+    }
+
+    private ProductResponseDto response(Product p) {
+        return new ProductResponseDto(
+                p.id(), p.name(), p.description(), p.price(), p.category(), p.available()
+        );
+    }
+
+    // ============================================================
+    // createProduct
+    // ============================================================
 
     @Test
     @DisplayName("Deve criar produto com sucesso")
-    void shouldCreateProductSuccessfully() throws Exception {
-        UUID newId = UUID.randomUUID();
-        ProductDto request =
-                new ProductDto(newId, "Burger", "Desc", new BigDecimal("20.00"),
-                        Product.Category.LANCHE, true);
-
-        when(dataSource.existsByName("Burger")).thenReturn(false);
-        when(dataSource.saveProduct(any())).thenReturn(
-                new ProductDto(newId,
-                        "Burger", "Desc",
-                        new BigDecimal("20.00"),
-                        Product.Category.LANCHE,
-                        true
-                )
+    void shouldCreateProduct() throws DomainException {
+        ProductDto dto = new ProductDto(
+                UUID.randomUUID(), "Produto", "Desc",
+                BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
-        ProductController controller = new ProductController(dataSource);
-        ProductResponseDto response = controller.createProduct(request);
+        Product p = product();
+        ProductResponseDto r = response(p);
 
-        assertNotNull(response);
-        assertEquals("Burger", response.getName());
-        assertEquals(Product.Category.LANCHE, response.getCategory());
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class,
+                                (mock, ctx) -> when(mock.existsByName(dto.getName())).thenReturn(false));
 
-        verify(dataSource).existsByName("Burger");
-        verify(dataSource).saveProduct(any());
+                MockedConstruction<RegisterProductUseCase> uc =
+                        Mockito.mockConstruction(RegisterProductUseCase.class,
+                                (mock, ctx) -> when(mock.execute(dto)).thenReturn(p));
+
+                MockedStatic<ProductPresenter> presenter = Mockito.mockStatic(ProductPresenter.class)
+        ) {
+            presenter.when(() -> ProductPresenter.toDto(p)).thenReturn(r);
+
+            assertEquals(r, controller.createProduct(dto));
+        }
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao criar produto duplicado")
-    void shouldThrowExceptionWhenProductAlreadyExists() {
-        ProductDto request =
-                new ProductDto(UUID.randomUUID(), "Burger", "Desc", new BigDecimal("20.00"),
-                        Product.Category.LANCHE, true);
-
-        when(dataSource.existsByName("Burger")).thenReturn(true);
-
-        ProductController controller = new ProductController(dataSource);
-
-        DomainException exception = assertThrows(
-                DomainException.class,
-                () -> controller.createProduct(request)
+    @DisplayName("Deve lançar exceção ao tentar criar produto já existente")
+    void shouldThrowWhenProductExists() {
+        ProductDto dto = new ProductDto(
+                UUID.randomUUID(), "Produto", "Desc",
+                BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
-        assertEquals(
-                "Product name already registered in the database!",
-                exception.getMessage()
-        );
-
-        verify(dataSource).existsByName("Burger");
-        verify(dataSource, never()).saveProduct(any());
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class,
+                                (mock, ctx) -> when(mock.existsByName(dto.getName())).thenReturn(true))
+        ) {
+            assertThrows(DomainException.class, () -> controller.createProduct(dto));
+        }
     }
+
+    // ============================================================
+    // updateProduct
+    // ============================================================
 
     @Test
     @DisplayName("Deve atualizar produto com sucesso")
-    void shouldUpdateProductSuccessfully() {
-        UpdateProductRequestDto request =
-                new UpdateProductRequestDto(
-                        UUID.randomUUID(),
-                        "Burger",
-                        "Updated",
-                        new BigDecimal("25.00"),
-                        Product.Category.LANCHE,
-                        true
-                );
+    void shouldUpdateProduct() throws DomainException {
+        UpdateProductRequestDto req = new UpdateProductRequestDto(
+                UUID.randomUUID(), "Nome", "Desc",
+                BigDecimal.TEN, Product.Category.LANCHE, true
+        );
 
-        when(dataSource.updateProduct(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        Product p = product();
 
-        ProductController controller = new ProductController(dataSource);
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class);
 
-        assertDoesNotThrow(() -> controller.updateProduct(request));
+                MockedConstruction<UpdateProductUseCase> uc =
+                        Mockito.mockConstruction(UpdateProductUseCase.class,
+                                (mock, ctx) -> when(mock.execute(req)).thenReturn(p));
 
-        verify(dataSource).updateProduct(any());
+                MockedStatic<ProductPresenter> presenter = Mockito.mockStatic(ProductPresenter.class)
+        ) {
+            presenter.when(() -> ProductPresenter.toDto(p)).thenReturn(response(p));
+
+            assertDoesNotThrow(() -> controller.updateProduct(req));
+        }
     }
 
+    // ============================================================
+    // getProductsByCategory
+    // ============================================================
+
     @Test
-    @DisplayName("Deve retornar produtos por categoria")
+    @DisplayName("Deve retornar lista de produtos por categoria")
     void shouldReturnProductsByCategory() {
-        when(dataSource.getByCategory(Product.Category.BEBIDA))
-                .thenReturn(List.of(
-                        new ProductDto(
-                                UUID.randomUUID(), "Coca", "Refrigerante",
-                                new BigDecimal("7.00"),
-                                Product.Category.BEBIDA,
-                                true
-                        )
-                ));
+        Product p = product();
+        List<Product> list = List.of(p);
+        List<ProductResponseDto> resp = List.of(response(p));
 
-        ProductController controller = new ProductController(dataSource);
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class);
 
-        List<ProductResponseDto> result =
-                controller.getProductsByCategory(Product.Category.BEBIDA);
+                MockedConstruction<GetProductsByCategoryUseCase> uc =
+                        Mockito.mockConstruction(GetProductsByCategoryUseCase.class,
+                                (mock, ctx) -> when(mock.execute(Product.Category.LANCHE)).thenReturn(list));
 
-        assertEquals(1, result.size());
-        assertEquals("Coca", result.getFirst().getName());
+                MockedStatic<ProductPresenter> presenter = Mockito.mockStatic(ProductPresenter.class)
+        ) {
+            presenter.when(() -> ProductPresenter.toDtoList(list)).thenReturn(resp);
 
-        verify(dataSource).getByCategory(Product.Category.BEBIDA);
+            assertEquals(resp, controller.getProductsByCategory(Product.Category.LANCHE));
+        }
     }
 
+    // ============================================================
+    // getProductById
+    // ============================================================
+
     @Test
-    @DisplayName("Deve retornar todos os produtos")
-    void shouldReturnAllProducts() {
-        when(dataSource.getAll()).thenReturn(List.of(
-                new ProductDto(
-                        UUID.randomUUID(), "Burger", "Desc",
-                        new BigDecimal("20.00"),
-                        Product.Category.LANCHE,
-                        true
-                ),
-                new ProductDto(
-                        UUID.randomUUID(), "Coca", "Refri",
-                        new BigDecimal("7.00"),
-                        Product.Category.BEBIDA,
-                        true
-                )
-        ));
+    @DisplayName("Deve retornar produto por ID")
+    void shouldReturnProductById() {
+        UUID id = UUID.randomUUID();
+        Product p = product();
+        ProductResponseDto r = response(p);
 
-        ProductController controller = new ProductController(dataSource);
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class);
 
-        List<ProductResponseDto> result = controller.getAll();
+                MockedConstruction<GetProductByIdUseCase> uc =
+                        Mockito.mockConstruction(GetProductByIdUseCase.class,
+                                (mock, ctx) -> when(mock.execute(id)).thenReturn(p));
 
-        assertEquals(2, result.size());
+                MockedStatic<ProductPresenter> presenter = Mockito.mockStatic(ProductPresenter.class)
+        ) {
+            presenter.when(() -> ProductPresenter.toDto(p)).thenReturn(r);
 
-        verify(dataSource).getAll();
+            assertEquals(r, controller.getProductById(id));
+        }
+    }
+
+    // ============================================================
+    // getProductByName
+    // ============================================================
+
+    @Test
+    @DisplayName("Deve retornar produto por nome")
+    void shouldReturnProductByName() {
+        Product p = product();
+        ProductResponseDto r = response(p);
+
+        try (
+                MockedConstruction<ProductGateway> gw =
+                        Mockito.mockConstruction(ProductGateway.class);
+
+                MockedConstruction<GetProductByNameUseCase> uc =
+                        Mockito.mockConstruction(GetProductByNameUseCase.class,
+                                (mock, ctx) -> when(mock.execute("Produto")).thenReturn(p));
+
+                MockedStatic<ProductPresenter> presenter = Mockito.mockStatic(ProductPresenter.class)
+        ) {
+            presenter.when(() -> ProductPresenter.toDto(p)).thenReturn(r);
+
+            assertEquals(r, controller.getProductByName("Produto"));
+        }
     }
 }
-

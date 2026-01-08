@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.postechfiap-group130</groupId>
-	<artifactId>techchallenge-fastfood</artifactId>
+	<artifactId>product-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>techchallenge-fastfood</name>
+	<name>product-app</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

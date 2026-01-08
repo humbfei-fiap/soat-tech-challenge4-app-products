@@ -6,7 +6,7 @@ import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.Pro
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 
 public class ProductPresenter {
-
+    private ProductPresenter(){}
     public static ProductResponseDto toDto(Product product) {
         return new ProductResponseDto(
                         product.id(),
@@ -19,7 +19,7 @@ public class ProductPresenter {
     }
 
     public static List<ProductResponseDto> toDtoList(List<Product> listProduct) {
-        List<ProductResponseDto> productDtoList = listProduct.stream()
+        return listProduct.stream()
                 .map((product -> new ProductResponseDto(
                         product.id(),
                         product.name(),
@@ -29,6 +29,5 @@ public class ProductPresenter {
                         product.available()
                     )))
                 .toList();
-        return productDtoList;
     }
 }

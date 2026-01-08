@@ -6,10 +6,6 @@ import com.postechfiap_group130.techchallenge_fastfood.core.interfaces.DataSourc
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,136 +14,181 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ProductGatewayTest {
 
-    @Mock
     private DataSource dataSource;
-
-    @InjectMocks
-    private ProductGateway productGateway;
-
-    private Product product;
-    private ProductDto productDto;
+    private ProductGateway gateway;
 
     @BeforeEach
     void setup() {
-        UUID newId = UUID.randomUUID();
-        product = new Product(
-                newId,
-                "Hamburguer",
-                "Hamburguer artesanal",
-                new BigDecimal("29.90"),
-                Product.Category.LANCHE,
-                true
-        );
+        dataSource = mock(DataSource.class);
+        gateway = new ProductGateway(dataSource);
+    }
 
-        productDto = new ProductDto(
-                newId,
-                "Hamburguer",
-                "Hamburguer artesanal",
-                new BigDecimal("29.90"),
+    private Product createEntity() {
+        return new Product(
+                UUID.randomUUID(),
+                "Produto",
+                "Descrição",
+                new BigDecimal("10.00"),
                 Product.Category.LANCHE,
                 true
         );
     }
 
+    private ProductDto createDto() {
+        return new ProductDto(
+                UUID.randomUUID(),
+                "Produto",
+                "Descrição",
+                new BigDecimal("10.00"),
+                Product.Category.LANCHE,
+                true
+        );
+    }
+
+    // ============================
+    // saveProduct
+    // ============================
+
     @Test
-    @DisplayName("Deve salvar produto com sucesso")
+    @DisplayName("Deve salvar produto e retornar entidade convertida")
     void shouldSaveProduct() {
-        when(dataSource.saveProduct(any(ProductDto.class))).thenReturn(productDto);
+        Product entity = createEntity();
+        ProductDto dto = createDto();
 
-        Product result = productGateway.saveProduct(product);
+        when(dataSource.saveProduct(any(ProductDto.class))).thenReturn(dto);
+
+        Product result = gateway.saveProduct(entity);
 
         assertNotNull(result);
-        assertEquals(productDto.getId(), result.id());
-        assertEquals(productDto.getName(), result.name());
-        assertEquals(productDto.getDescription(), result.description());
-        assertEquals(productDto.getPrice(), result.price());
-        assertEquals(productDto.getCategory(), result.category());
-        assertEquals(productDto.getAvailable(), result.available());
+        assertEquals(dto.getId(), result.id());
+        assertEquals(dto.getName(), result.name());
+        assertEquals(dto.getDescription(), result.description());
+        assertEquals(dto.getPrice(), result.price());
+        assertEquals(dto.getCategory(), result.category());
+        assertEquals(dto.getAvailable(), result.available());
 
-        verify(dataSource, times(1)).saveProduct(any(ProductDto.class));
+        verify(dataSource).saveProduct(any(ProductDto.class));
     }
 
+    // ============================
+    // updateProduct
+    // ============================
+
     @Test
-    @DisplayName("Deve atualizar produto com sucesso")
+    @DisplayName("Deve atualizar produto e retornar entidade convertida")
     void shouldUpdateProduct() {
-        when(dataSource.updateProduct(any(ProductDto.class))).thenReturn(productDto);
+        Product entity = createEntity();
+        ProductDto dto = createDto();
 
-        Product result = productGateway.updateProduct(product);
+        when(dataSource.updateProduct(any(ProductDto.class))).thenReturn(dto);
+
+        Product result = gateway.updateProduct(entity);
 
         assertNotNull(result);
-        assertEquals(product.id(), result.id());
+        assertEquals(dto.getId(), result.id());
+        assertEquals(dto.getName(), result.name());
+        assertEquals(dto.getDescription(), result.description());
+        assertEquals(dto.getPrice(), result.price());
+        assertEquals(dto.getCategory(), result.category());
+        assertEquals(dto.getAvailable(), result.available());
 
-        verify(dataSource, times(1)).updateProduct(any(ProductDto.class));
+        verify(dataSource).updateProduct(any(ProductDto.class));
     }
 
-    //@Test
-    @DisplayName("Deve encontrar produto por ID")
-    void shouldFindById() {
-        UUID id = UUID.randomUUID();
-        when(dataSource.findById(id)).thenReturn(productDto);
+    // ============================
+    // findById
+    // ============================
 
-        Product result = productGateway.findById(id);
+    @Test
+    @DisplayName("Deve retornar produto quando encontrado por ID")
+    void shouldFindById() {
+        ProductDto dto = createDto();
+        UUID id = dto.getId();
+
+        when(dataSource.findById(id)).thenReturn(dto);
+
+        Product result = gateway.findById(id);
 
         assertNotNull(result);
-        assertEquals(id, result.id());
-
-        verify(dataSource, times(1)).findById(id);
+        assertEquals(dto.getId(), result.id());
     }
 
     @Test
-    @DisplayName("Deve retornar null quando produto não existir")
-    void shouldReturnNullWhenProductNotFound() {
-        UUID newid = UUID.randomUUID();
-        when(dataSource.findById(newid)).thenReturn(null);
+    @DisplayName("Deve retornar null quando produto não encontrado por ID")
+    void shouldReturnNullWhenFindByIdNotFound() {
+        UUID id = UUID.randomUUID();
 
-        Product result = productGateway.findById(newid);
+        when(dataSource.findById(id)).thenReturn(null);
+
+        Product result = gateway.findById(id);
 
         assertNull(result);
-
-        verify(dataSource, times(1)).findById(newid);
     }
 
-    @Test
-    @DisplayName("Deve retornar lista de produtos")
-    void shouldFindAll() {
-        when(dataSource.getAll()).thenReturn(List.of(productDto));
+    // ============================
+    // findByName
+    // ============================
 
-        List<Product> result = productGateway.findAll();
+    @Test
+    @DisplayName("Deve retornar produto quando encontrado por nome")
+    void shouldFindByName() {
+        ProductDto dto = createDto();
+
+        when(dataSource.findByName("Produto")).thenReturn(dto);
+
+        Product result = gateway.findByName("Produto");
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(productDto.getName(), result.get(0).name());
-
-        verify(dataSource, times(1)).getAll();
+        assertEquals(dto.getName(), result.name());
     }
 
     @Test
-    @DisplayName("Deve retornar lista de produtos por categoria")
+    @DisplayName("Deve retornar null quando produto não encontrado por nome")
+    void shouldReturnNullWhenFindByNameNotFound() {
+        when(dataSource.findByName("Inexistente")).thenReturn(null);
+
+        Product result = gateway.findByName("Inexistente");
+
+        assertNull(result);
+    }
+
+    // ============================
+    // findAllByCategory
+    // ============================
+
+    @Test
+    @DisplayName("Deve retornar lista convertida de produtos por categoria")
     void shouldFindAllByCategory() {
+        ProductDto dto = createDto();
+
         when(dataSource.getByCategory(Product.Category.LANCHE))
-                .thenReturn(List.of(productDto));
+                .thenReturn(List.of(dto));
 
-        List<Product> result = productGateway.findAllByCategory(Product.Category.LANCHE);
+        List<Product> result = gateway.findAllByCategory(Product.Category.LANCHE);
 
-        assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(Product.Category.LANCHE, result.get(0).category());
+        assertEquals(dto.getId(), result.get(0).id());
+    }
 
-        verify(dataSource, times(1)).getByCategory(Product.Category.LANCHE);
+    // ============================
+    // existsByName
+    // ============================
+
+    @Test
+    @DisplayName("Deve retornar true quando produto existe pelo nome")
+    void shouldReturnTrueWhenExistsByName() {
+        when(dataSource.existsByName("Produto")).thenReturn(true);
+
+        assertTrue(gateway.existsByName("Produto"));
     }
 
     @Test
-    @DisplayName("Deve verificar se produto existe pelo nome")
-    void shouldCheckIfExistsByName() {
-        when(dataSource.existsByName("Hamburguer")).thenReturn(true);
+    @DisplayName("Deve retornar false quando produto não existe pelo nome")
+    void shouldReturnFalseWhenNotExistsByName() {
+        when(dataSource.existsByName("Produto")).thenReturn(false);
 
-        Boolean exists = productGateway.existsByName("Hamburguer");
-
-        assertTrue(exists);
-
-        verify(dataSource, times(1)).existsByName("Hamburguer");
+        assertFalse(gateway.existsByName("Produto"));
     }
 }
