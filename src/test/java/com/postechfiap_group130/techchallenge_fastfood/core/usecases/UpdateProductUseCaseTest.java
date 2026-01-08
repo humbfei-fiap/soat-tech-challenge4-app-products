@@ -1,6 +1,6 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.usecases;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import com.postechfiap_group130.techchallenge_fastfood.core.gateways.ProductGateway;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ class UpdateProductUseCaseTest {
     void shouldUpdateProduct() {
         // Arrange
         UUID newId = UUID.randomUUID();
-        UpdateProductRequestDto requestDto = new UpdateProductRequestDto(
+        ProductDto requestDto = new ProductDto(
                 newId,
                 "Hamburguer",
                 "Hamburguer artesanal",

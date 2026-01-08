@@ -2,7 +2,6 @@ package com.postechfiap_group130.techchallenge_fastfood.api.rest.controller;
 
 import com.postechfiap_group130.techchallenge_fastfood.api.data.DataRepository;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.controllers.ProductController;
@@ -25,12 +24,11 @@ import static org.mockito.Mockito.*;
 
 class ProductResourceTest {
 
-    private DataRepository dataRepository;
     private ProductResource resource;
 
     @BeforeEach
     void setup() {
-        dataRepository = mock(DataRepository.class);
+        DataRepository dataRepository = mock(DataRepository.class);
         resource = new ProductResource(dataRepository);
     }
 
@@ -129,7 +127,7 @@ class ProductResourceTest {
     @Test
     @DisplayName("Deve atualizar produto com status 200")
     void shouldUpdateProduct() throws DomainException {
-        UpdateProductRequestDto request = new UpdateProductRequestDto(
+        ProductDto request = new ProductDto(
                 UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
@@ -163,7 +161,7 @@ class ProductResourceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar produto")
     void shouldThrowExceptionOnUpdate() throws DomainException {
-        UpdateProductRequestDto request = new UpdateProductRequestDto(
+        ProductDto request = new ProductDto(
                 UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
