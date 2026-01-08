@@ -6,8 +6,8 @@ on:
       - 'develop'
     
 jobs:
-  build: 
-    name:  Build  and  analyze 
+  sonar_analyse: 
+    name:  Build  and  analyze Sonarqube /develop
     runs-on:  ubuntu-latest 
     steps:
       - uses: actions/checkout@v4
@@ -30,17 +30,24 @@ jobs:
           path: ~/.m2/
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }} 
           restore-keys: ${{ runner.os }}-m2
+      - name: Corrigir encoding de arquivos properties
+        run: |
+          find . -path "*/src/main/resources/*.properties" -type f -exec sh -c 'iconv -f ISO-8859-1 -t UTF-8 "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \; || true
+          
 
       - name: Build and analyze 
         env: 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
 
-        run: mvn -f app-customer/pom.xml -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TechFiap_soat-tech-challenge4-app-customer
+        run: |
+          POM_FILE=$(find . -name "pom.xml" -not -path "*/target/*" -maxdepth 2 | head -n 1)
+          if [ -z "$POM_FILE" ]; then echo "pom.xml not found"; exit 1; fi
+          mvn -f "$POM_FILE" -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TechFiap_soat-tech-challenge4-app-products
 
            
   create_pull_request:  
     runs-on: ubuntu-latest
-    needs: build     
+    needs: sonar_analyse     
     permissions:
       pull-requests: write
       contents: write
@@ -59,3 +66,4 @@ jobs:
             O PR está pronto para revisão.
           pr_label: "automação"
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
