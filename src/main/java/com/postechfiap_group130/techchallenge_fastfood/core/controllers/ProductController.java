@@ -1,6 +1,7 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
@@ -10,17 +11,14 @@ import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import com.postechfiap_group130.techchallenge_fastfood.core.gateways.ProductGateway;
 import com.postechfiap_group130.techchallenge_fastfood.core.interfaces.DataSource;
 import com.postechfiap_group130.techchallenge_fastfood.core.presenters.ProductPresenter;
-import com.postechfiap_group130.techchallenge_fastfood.core.usecases.GetAllProductsUseCase;
-import com.postechfiap_group130.techchallenge_fastfood.core.usecases.GetProductsByCategoryUseCase;
-import com.postechfiap_group130.techchallenge_fastfood.core.usecases.RegisterProductUseCase;
-import com.postechfiap_group130.techchallenge_fastfood.core.usecases.UpdateProductUseCase;
+import com.postechfiap_group130.techchallenge_fastfood.core.usecases.*;
 
 public record ProductController(DataSource dataSource) {
 
-    public ProductResponseDto createProduct(ProductDto productDto) throws Exception {
+    public ProductResponseDto createProduct(ProductDto productDto) throws DomainException {
         ProductGateway productGateway = new ProductGateway(dataSource);
         Boolean existProduct = productGateway.existsByName(productDto.getName());
-        if (existProduct) {
+        if (Boolean.TRUE.equals(existProduct)) {
             throw new DomainException("Product name already registered in the database!");
         }
         RegisterProductUseCase registerProductUseCase = new RegisterProductUseCase(productGateway);
@@ -42,10 +40,17 @@ public record ProductController(DataSource dataSource) {
         return ProductPresenter.toDtoList(products);
     }
 
-    public List<ProductResponseDto> getAll() {
+    public ProductResponseDto getProductById(UUID id) {
         ProductGateway productGateway = new ProductGateway(dataSource);
-        GetAllProductsUseCase getAllProductsUseCase = new GetAllProductsUseCase(productGateway);
-        List<Product> products = getAllProductsUseCase.execute();
-        return ProductPresenter.toDtoList(products);
+        GetProductByIdUseCase getProductByIdUseCase = new GetProductByIdUseCase(productGateway);
+        Product product = getProductByIdUseCase.execute(id);
+        return ProductPresenter.toDto(product);
+    }
+
+    public ProductResponseDto getProductByName(String name) {
+        ProductGateway productGateway = new ProductGateway(dataSource);
+        GetProductByNameUseCase ggtProductByNameUseCase = new GetProductByNameUseCase(productGateway);
+        Product product = ggtProductByNameUseCase.execute(name);
+        return ProductPresenter.toDto(product);
     }
 }

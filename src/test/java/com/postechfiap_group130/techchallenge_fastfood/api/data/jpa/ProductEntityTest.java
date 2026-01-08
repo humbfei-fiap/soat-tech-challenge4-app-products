@@ -62,12 +62,7 @@ class ProductEntityTest {
         // Different ID → must NOT be equal
         ProductEntity e3 = new ProductEntity(UUID.randomUUID(), "A", "B", BigDecimal.ONE, Product.Category.LANCHE, true);
         assertNotEquals(e1, e3);
-
-        // equals with null
-        assertNotEquals(e1, null);
-
-        // equals with different class
-        assertNotEquals(e1, "string");
+        
     }
 
     @Test

@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProductJpaRepository extends JpaRepository<ProductEntity, UUID> {
     @Query(nativeQuery = true, value = "SELECT * FROM products WHERE category = :#{#category?.name()}")
     List<ProductEntity> getByCategory(Product.Category category);
-    @Query(nativeQuery = true, value = "SELECT * FROM products")
-    List<ProductEntity> getAll();
+
+    ProductEntity findByName(String name);
+
     Boolean existsByName(String name);
 }

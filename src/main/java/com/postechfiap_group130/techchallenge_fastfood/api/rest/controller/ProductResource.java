@@ -19,42 +19,36 @@ import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.Pro
 @RestController
 @RequestMapping("/products")
 public class ProductResource {
-    
     private final DataRepository dataRepository;
-    
+
     public ProductResource(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
-        
+
     }
 
-    @GetMapping("/getall")
-    public ResponseEntity<?> GetAll() {
-        try {
-            ProductController productController = new ProductController(dataRepository);
-            List<ProductResponseDto> productResponseDto = productController.getAll();
-            return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Category");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable UUID id) {
+        ProductController productController = new ProductController(dataRepository);
+        ProductResponseDto productResponseDto = productController.getProductById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ProductResponseDto> getProductByName(@PathVariable String name) {
+        ProductController productController = new ProductController(dataRepository);
+        ProductResponseDto productResponseDto = productController.getProductByName(name);
+        if (productResponseDto == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
     }
     @GetMapping("/category/{category}")
-    public ResponseEntity<?> GetProductByCategory(@PathVariable Product.Category category) {
-        if (category == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Category");
-        try {
-            ProductController productController = new ProductController(dataRepository);
-            List<ProductResponseDto> productResponseDto = productController.getProductsByCategory(category);
-            return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);    
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Category");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<List<ProductResponseDto>> getProductByCategory(@PathVariable Product.Category category) {
+        ProductController productController = new ProductController(dataRepository);
+        List<ProductResponseDto> productResponseDto = productController.getProductsByCategory(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDto);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto productRequestDto) throws Exception {
+    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto productRequestDto) throws DomainException {
         ProductDto produtoDto = new ProductDto(UUID.randomUUID(), productRequestDto.getName(),
                 productRequestDto.getDescription(), productRequestDto.getPrice(), productRequestDto.getCategory(),
                 true);
@@ -62,17 +56,11 @@ public class ProductResource {
         ProductResponseDto productResponseDto = productController.createProduct(produtoDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDto);
     }
-    
+
     @PutMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody UpdateProductRequestDto updateProdutoDto) throws DomainException {
-        try {
-            ProductController productController = new ProductController(dataRepository);
-            productController.updateProduct(updateProdutoDto);
-            return ResponseEntity.status(HttpStatus.OK).body(null);    
-        }  catch (DomainException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody UpdateProductRequestDto updateProdutoDto) throws DomainException {
+        ProductController productController = new ProductController(dataRepository);
+        productController.updateProduct(updateProdutoDto);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
