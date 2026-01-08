@@ -2,7 +2,6 @@ package com.postechfiap_group130.techchallenge_fastfood.api.rest.controller;
 
 import com.postechfiap_group130.techchallenge_fastfood.api.data.DataRepository;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.controllers.ProductController;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
@@ -36,7 +35,7 @@ class ProductResourceTest {
     @DisplayName("Deve retornar produto por ID com status 200")
     void shouldReturnProductById() {
         UUID id = UUID.randomUUID();
-        ProductResponseDto mockResponse = new ProductResponseDto(
+        ProductDto mockResponse = new ProductDto(
                 id, "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
@@ -44,7 +43,7 @@ class ProductResourceTest {
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> when(mock.getProductById(id)).thenReturn(mockResponse))) {
 
-            ResponseEntity<ProductResponseDto> response = resource.getProductById(id);
+            ResponseEntity<ProductDto> response = resource.getProductById(id);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(mockResponse, response.getBody());
@@ -54,7 +53,7 @@ class ProductResourceTest {
     @Test
     @DisplayName("Deve retornar produto por nome com status 200")
     void shouldReturnProductByName() {
-        ProductResponseDto mockResponse = new ProductResponseDto(
+        ProductDto mockResponse = new ProductDto(
                 UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
@@ -62,7 +61,7 @@ class ProductResourceTest {
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> when(mock.getProductByName("Nome")).thenReturn(mockResponse))) {
 
-            ResponseEntity<ProductResponseDto> response = resource.getProductByName("Nome");
+            ResponseEntity<ProductDto> response = resource.getProductByName("Nome");
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(mockResponse, response.getBody());
@@ -76,7 +75,7 @@ class ProductResourceTest {
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> when(mock.getProductByName("Inexistente")).thenReturn(null))) {
 
-            ResponseEntity<ProductResponseDto> response = resource.getProductByName("Inexistente");
+            ResponseEntity<ProductDto> response = resource.getProductByName("Inexistente");
 
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
             assertNull(response.getBody());
@@ -86,15 +85,15 @@ class ProductResourceTest {
     @Test
     @DisplayName("Deve retornar lista de produtos por categoria com status 201")
     void shouldReturnProductsByCategory() {
-        List<ProductResponseDto> mockList = List.of(
-                new ProductResponseDto(UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true)
+        List<ProductDto> mockList = List.of(
+                new ProductDto(UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true)
         );
 
         try (MockedConstruction<ProductController> ignored =
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> when(mock.getProductsByCategory(Product.Category.LANCHE)).thenReturn(mockList))) {
 
-            ResponseEntity<List<ProductResponseDto>> response =
+            ResponseEntity<List<ProductDto>> response =
                     resource.getProductByCategory(Product.Category.LANCHE);
 
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -109,7 +108,7 @@ class ProductResourceTest {
                 "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE
         );
 
-        ProductResponseDto mockResponse = new ProductResponseDto(
+        ProductDto mockResponse = new ProductDto(
                 UUID.randomUUID(), "Nome", "Desc", BigDecimal.TEN, Product.Category.LANCHE, true
         );
 
@@ -117,7 +116,7 @@ class ProductResourceTest {
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> when(mock.createProduct(any(ProductDto.class))).thenReturn(mockResponse))) {
 
-            ResponseEntity<ProductResponseDto> response = resource.create(request);
+            ResponseEntity<ProductDto> response = resource.create(request);
 
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertEquals(mockResponse, response.getBody());
@@ -135,7 +134,7 @@ class ProductResourceTest {
                      Mockito.mockConstruction(ProductController.class,
                              (mock, context) -> doNothing().when(mock).updateProduct(request))) {
 
-            ResponseEntity<ProductResponseDto> response = resource.updateProduct(request);
+            ResponseEntity<ProductDto> response = resource.updateProduct(request);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNull(response.getBody());

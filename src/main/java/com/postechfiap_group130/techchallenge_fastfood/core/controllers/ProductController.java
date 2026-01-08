@@ -3,7 +3,6 @@ package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
@@ -14,7 +13,7 @@ import com.postechfiap_group130.techchallenge_fastfood.core.usecases.*;
 
 public record ProductController(DataSource dataSource) {
 
-    public ProductResponseDto createProduct(ProductDto productDto) throws DomainException {
+    public ProductDto createProduct(ProductDto productDto) throws DomainException {
         ProductGateway productGateway = new ProductGateway(dataSource);
         Boolean existProduct = productGateway.existsByName(productDto.getName());
         if (Boolean.TRUE.equals(existProduct)) {
@@ -32,21 +31,21 @@ public record ProductController(DataSource dataSource) {
         ProductPresenter.toDto(product);
     }
 
-    public List<ProductResponseDto> getProductsByCategory(Product.Category category) {
+    public List<ProductDto> getProductsByCategory(Product.Category category) {
         ProductGateway productGateway = new ProductGateway(dataSource);
         GetProductsByCategoryUseCase getProductsByCategoryUseCase = new GetProductsByCategoryUseCase(productGateway);
         List<Product> products = getProductsByCategoryUseCase.execute(category);
         return ProductPresenter.toDtoList(products);
     }
 
-    public ProductResponseDto getProductById(UUID id) {
+    public ProductDto getProductById(UUID id) {
         ProductGateway productGateway = new ProductGateway(dataSource);
         GetProductByIdUseCase getProductByIdUseCase = new GetProductByIdUseCase(productGateway);
         Product product = getProductByIdUseCase.execute(id);
         return ProductPresenter.toDto(product);
     }
 
-    public ProductResponseDto getProductByName(String name) {
+    public ProductDto getProductByName(String name) {
         ProductGateway productGateway = new ProductGateway(dataSource);
         GetProductByNameUseCase ggtProductByNameUseCase = new GetProductByNameUseCase(productGateway);
         Product product = ggtProductByNameUseCase.execute(name);

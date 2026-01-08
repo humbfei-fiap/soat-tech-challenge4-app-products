@@ -1,6 +1,6 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.presenters;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class ProductPresenterTest {
     void shouldConvertToDto() {
         Product product = createProduct();
 
-        ProductResponseDto dto = ProductPresenter.toDto(product);
+        ProductDto dto = ProductPresenter.toDto(product);
 
         assertNotNull(dto);
         // Ajuste aqui: usando getters, que é o mais comum
@@ -49,7 +49,7 @@ class ProductPresenterTest {
         Product p1 = createProduct();
         Product p2 = createProduct();
 
-        List<ProductResponseDto> list = ProductPresenter.toDtoList(List.of(p1, p2));
+        List<ProductDto> list = ProductPresenter.toDtoList(List.of(p1, p2));
 
         assertEquals(2, list.size());
         assertEquals(p1.id(), list.get(0).getId());
@@ -59,7 +59,7 @@ class ProductPresenterTest {
     @Test
     @DisplayName("Deve converter lista vazia sem erros")
     void shouldConvertEmptyList() {
-        List<ProductResponseDto> list = ProductPresenter.toDtoList(List.of());
+        List<ProductDto> list = ProductPresenter.toDtoList(List.of());
         assertNotNull(list);
         assertTrue(list.isEmpty());
     }

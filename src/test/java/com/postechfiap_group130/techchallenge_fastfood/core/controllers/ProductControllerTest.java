@@ -1,6 +1,5 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
@@ -44,8 +43,8 @@ class ProductControllerTest {
         );
     }
 
-    private ProductResponseDto response(Product p) {
-        return new ProductResponseDto(
+    private ProductDto response(Product p) {
+        return new ProductDto(
                 p.id(), p.name(), p.description(), p.price(), p.category(), p.available()
         );
     }
@@ -63,7 +62,7 @@ class ProductControllerTest {
         );
 
         Product p = product();
-        ProductResponseDto r = response(p);
+        ProductDto r = response(p);
 
         try (
                 MockedConstruction<ProductGateway> gw =
@@ -138,7 +137,7 @@ class ProductControllerTest {
     void shouldReturnProductsByCategory() {
         Product p = product();
         List<Product> list = List.of(p);
-        List<ProductResponseDto> resp = List.of(response(p));
+        List<ProductDto> resp = List.of(response(p));
 
         try (
                 MockedConstruction<ProductGateway> gw =
@@ -165,7 +164,7 @@ class ProductControllerTest {
     void shouldReturnProductById() {
         UUID id = UUID.randomUUID();
         Product p = product();
-        ProductResponseDto r = response(p);
+        ProductDto r = response(p);
 
         try (
                 MockedConstruction<ProductGateway> gw =
@@ -191,7 +190,7 @@ class ProductControllerTest {
     @DisplayName("Deve retornar produto por nome")
     void shouldReturnProductByName() {
         Product p = product();
-        ProductResponseDto r = response(p);
+        ProductDto r = response(p);
 
         try (
                 MockedConstruction<ProductGateway> gw =

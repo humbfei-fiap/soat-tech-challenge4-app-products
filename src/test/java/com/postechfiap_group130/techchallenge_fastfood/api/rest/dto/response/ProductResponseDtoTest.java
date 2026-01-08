@@ -1,5 +1,6 @@
 package com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response;
 
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ class ProductResponseDtoTest {
     @DisplayName("Deve criar ProductResponseDto usando construtor completo")
     void shouldCreateUsingAllArgsConstructor() {
         UUID newId = UUID.randomUUID();
-        ProductResponseDto dto = new ProductResponseDto(
+        ProductDto dto = new ProductDto(
                 newId,
                 "Hamburguer",
                 "Hamburguer artesanal",
@@ -35,7 +36,7 @@ class ProductResponseDtoTest {
     @Test
     @DisplayName("Deve testar todos os getters e setters")
     void shouldTestAllGettersAndSetters() {
-        ProductResponseDto dto = new ProductResponseDto(
+        ProductDto dto = new ProductDto(
                 null, null, null, null, null, null
         );
 

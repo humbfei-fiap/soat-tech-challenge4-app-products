@@ -2,13 +2,13 @@ package com.postechfiap_group130.techchallenge_fastfood.core.presenters;
 
 import java.util.List;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
+import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 
 public class ProductPresenter {
     private ProductPresenter(){}
-    public static ProductResponseDto toDto(Product product) {
-        return new ProductResponseDto(
+    public static ProductDto toDto(Product product) {
+        return new ProductDto(
                         product.id(),
                         product.name(),
                         product.description(),
@@ -18,9 +18,9 @@ public class ProductPresenter {
                     );
     }
 
-    public static List<ProductResponseDto> toDtoList(List<Product> listProduct) {
+    public static List<ProductDto> toDtoList(List<Product> listProduct) {
         return listProduct.stream()
-                .map((product -> new ProductResponseDto(
+                .map((product -> new ProductDto(
                         product.id(),
                         product.name(),
                         product.description(),
