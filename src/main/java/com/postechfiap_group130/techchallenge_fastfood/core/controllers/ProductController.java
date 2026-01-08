@@ -3,7 +3,6 @@ package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
@@ -26,10 +25,10 @@ public record ProductController(DataSource dataSource) {
         return ProductPresenter.toDto(product);
     }
 
-    public void updateProduct(UpdateProductRequestDto updateProductRequestDto) throws DomainException {
+    public void updateProduct(ProductDto productDto) throws DomainException {
         ProductGateway productGateway = new ProductGateway(dataSource);
         UpdateProductUseCase updateProductUseCase = new UpdateProductUseCase(productGateway);
-        Product product = updateProductUseCase.execute(updateProductRequestDto);
+        Product product = updateProductUseCase.execute(productDto);
         ProductPresenter.toDto(product);
     }
 

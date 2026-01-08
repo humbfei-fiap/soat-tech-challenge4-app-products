@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import com.postechfiap_group130.techchallenge_fastfood.core.controllers.ProductController;
 import com.postechfiap_group130.techchallenge_fastfood.api.data.DataRepository;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.ProductRequestDto;
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 
 @RestController
@@ -58,7 +57,7 @@ public class ProductResource {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody UpdateProductRequestDto updateProdutoDto) throws DomainException {
+    public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody ProductDto updateProdutoDto) throws DomainException {
         ProductController productController = new ProductController(dataRepository);
         productController.updateProduct(updateProdutoDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);

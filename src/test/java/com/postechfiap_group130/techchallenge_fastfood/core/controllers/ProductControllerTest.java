@@ -1,6 +1,5 @@
 package com.postechfiap_group130.techchallenge_fastfood.core.controllers;
 
-import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.request.UpdateProductRequestDto;
 import com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response.ProductResponseDto;
 import com.postechfiap_group130.techchallenge_fastfood.application.exceptions.DomainException;
 import com.postechfiap_group130.techchallenge_fastfood.core.dtos.ProductDto;
@@ -107,7 +106,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("Deve atualizar produto com sucesso")
     void shouldUpdateProduct() throws DomainException {
-        UpdateProductRequestDto req = new UpdateProductRequestDto(
+        ProductDto req = new ProductDto(
                 UUID.randomUUID(), "Nome", "Desc",
                 BigDecimal.TEN, Product.Category.LANCHE, true
         );
