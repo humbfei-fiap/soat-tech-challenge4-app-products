@@ -2,7 +2,7 @@ package com.postechfiap_group130.techchallenge_fastfood.api.rest.dto.response;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.postechfiap_group130.techchallenge_fastfood.core.entities.Product;
 
 public class ProductResponseDto {

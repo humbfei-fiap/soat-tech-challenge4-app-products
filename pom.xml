@@ -11,7 +11,7 @@
 	<groupId>com.postechfiap-group130</groupId>
 	<artifactId>techchallenge-fastfood</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>techchallenge-fastfood</name>
+	<name>app-products</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
