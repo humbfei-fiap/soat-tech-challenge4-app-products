@@ -9,7 +9,7 @@ public interface IProductGateway {
     Product saveProduct(Product product);
     Product updateProduct(Product product);
     Product findById(UUID id);
-    List<Product> findAll();
+    Product findByName(String name);
     List<Product> findAllByCategory(Product.Category category);
     Boolean existsByName(String name);
 }

@@ -25,6 +25,8 @@ public class ProductEntity {
         this.available = available;
     }
 
+    public ProductEntity() {}
+
     @Id
     private UUID id;
     private String name;

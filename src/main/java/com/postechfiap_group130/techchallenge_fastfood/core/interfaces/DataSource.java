@@ -13,7 +13,7 @@ public interface DataSource {
     ProductDto saveProduct(ProductDto productDto);
     ProductDto updateProduct(ProductDto productDto);
     ProductDto findById(UUID id);
-    List<ProductDto> getAll();
+    ProductDto findByName(String name);
     List<ProductDto> getByCategory(Product.Category  category);
     Boolean existsByName(String name);
 }
