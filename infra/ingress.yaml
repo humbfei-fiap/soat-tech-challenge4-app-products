@@ -1,17 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fastfood-api-ingress
-  namespace: fastfood-app
+  name: products-ingress
+  namespace: products-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
   - http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /products(/|$)(.*)
+        pathType: ImplementationSpecific
         backend:  
           service:
-            name: fastfood-api-service
+            name: products-service
             port:
               number: 8080
